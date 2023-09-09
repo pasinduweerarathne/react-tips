@@ -1,39 +1,35 @@
-import { useState, useMemo, useRef } from "react";
+// if it take too much time to calculate a value we can use useMemo
+// to check referential equality we can use useMemo
+import { useMemo, useState } from "react";
+
+const slowFunction = (num) => {
+  console.log("calling slow function");
+  for (let i = 0; i <= 100000000; i++) {}
+  return num * 2;
+};
 
 function App() {
-  const inputRef = useRef();
-  const [items, setItems] = useState([]);
-  const [query, setQuery] = useState("");
+  const [number, setNumber] = useState(0);
+  const [dark, setDark] = useState(false);
 
-  const filteredItems = useMemo(() => {
-    return items.filter((item) =>
-      item.toLowerCase().includes(query.toLowerCase())
-    );
-  }, [items, query]);
+  const doubleNumber = useMemo(() => {
+    return slowFunction(number);
+  }, [number]);
 
-  const onSubmit = (e) => {
-    e.preventDefault();
-    const value = inputRef.current.value;
-    setItems((prev) => {
-      return [...prev, value];
-    });
-    inputRef.current.value = "";
+  const themeStyles = {
+    backgroundColor: dark ? "black" : "white",
+    color: dark ? "white" : "black",
   };
 
   return (
     <>
-      Search:
-      <input type="search" onChange={(e) => setQuery(e.target.value)} />
-      <br />
-      <br />
-      <form onSubmit={onSubmit}>
-        New Item: <input ref={inputRef} type="text" />
-        <button type="submit">Add</button>
-      </form>
-      <h3>Items:</h3>
-      {filteredItems.map((item, i) => (
-        <div key={i}>{item}</div>
-      ))}
+      <input
+        type="number"
+        value={number}
+        onChange={(e) => setNumber(parseInt(e.target.value))}
+      />
+      <button onClick={() => setDark((prev) => !prev)}>Change Theme</button>
+      <div style={themeStyles}>{doubleNumber}</div>
     </>
   );
 }
